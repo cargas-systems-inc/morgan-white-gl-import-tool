@@ -1,0 +1,39 @@
+{
+  "id": "4a9ea596-caaf-47cb-a3b6-e3a16d21a7c6",
+  "name": "GLImport",
+  "publisher": "Cargas Systems, Inc.",
+  "version": "1.0.0.14",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [
+    {
+      "id": "e7e4551c-46e4-40a0-98aa-d33dc1d10bde"
+      ,"publisher": "Binary Stream Software Inc."
+      ,"name": "Multi-Entity Management (NA)"
+      ,"version": "1.0.0.0"
+    }
+  ],
+  "screenshots": [],
+  "platform": "1.0.0.0",
+  "application": "22.0.0.0",
+  "idRanges": [
+    {
+      "from": 99100,
+      "to": 99150
+    }
+  ],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": false,
+    "includeSourceInSymbolFile": true
+  },
+  "runtime": "11.0",
+  "features": [
+    "NoImplicitWith"
+  ]
+}
