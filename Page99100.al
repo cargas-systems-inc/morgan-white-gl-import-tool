@@ -172,6 +172,8 @@ page 99100 "GL Import Staging"
         NewDimSetId: integer;
         RowNo: Integer;
         MaxRowNo: Integer;
+        DimensionCode: Code[20];
+        DimensionValue: Code[20];
     begin
         RowNo := 0;
         MaxRowNo := 0;
@@ -202,38 +204,30 @@ page 99100 "GL Import Staging"
                 GenJrnlLine."Journal Batch Name" := GLImportStaging."Journal Batch Name";
                 GenJrnlLine."Line No." := GLImportStaging."Line No.";
 
-                // TempDimensionSetEntry.Init();
-                // TempDimensionSetEntry.Validate("Dimension Code", 'ENTITY');
-                // TempDimensionSetEntry.Validate("Dimension Value Code", GLImportStaging."Dimension 1");
-                // TempDimensionSetEntry.Insert(true);
-
-                // if (GLImportStaging."Dimension 2" <> '') then begin
-                //     TempDimensionSetEntry.Validate("Dimension Code", 'BUSINESS');
-                //     TempDimensionSetEntry.Validate("Dimension Value Code", GLImportStaging."Dimension 2");
-                //     TempDimensionSetEntry.Insert(true);
-                // end;
-
-                // if (GLImportStaging."Dimension 3" <> '') then begin
-                //     TempDimensionSetEntry.Validate("Dimension Code", 'REINSURACE');
-                //     TempDimensionSetEntry.Validate("Dimension Value Code", GLImportStaging."Dimension 3");
-                //     TempDimensionSetEntry.Insert(true);
-                // end;
-
-                // if (GLImportStaging."Dimension 4" <> '') then begin
-                //     TempDimensionSetEntry.Validate("Dimension Code", 'MISC');
-                //     TempDimensionSetEntry.Validate("Dimension Value Code", GLImportStaging."Dimension 4");
-                //     TempDimensionSetEntry.Insert(true);
-                // end;
-
-                // NewDimSetId := DimensionManagement.GetDimensionSetID(TempDimensionSetEntry);
-                // if NewDimSetId <> 0 then begin
-                //     GenJrnlLine."Dimension Set ID" := NewDimSetId;
-                // end;
-
                 if (GenJrnlLine.Insert()) then begin
+
+
+                    DimensionCode := 'ENTITY';
+                    DimensionValue := GLImportStaging."Dimension 1";
+                    AssignLineDimension(GenJrnlLine."Journal Template Name", GenJrnlLine."Journal Batch Name", GenJrnlLine."Line No.", DimensionCode, DimensionValue);
+
+
+                    DimensionCode := 'BUSINESS';
+                    DimensionValue := GLImportStaging."Dimension 2";
+                    AssignLineDimension(GenJrnlLine."Journal Template Name", GenJrnlLine."Journal Batch Name", GenJrnlLine."Line No.", DimensionCode, DimensionValue);
+
+
+                    DimensionCode := 'REINSURACE';
+                    DimensionValue := GLImportStaging."Dimension 3";
+                    AssignLineDimension(GenJrnlLine."Journal Template Name", GenJrnlLine."Journal Batch Name", GenJrnlLine."Line No.", DimensionCode, DimensionValue);
+
+
+                    DimensionCode := 'MISC';
+                    DimensionValue := GLImportStaging."Dimension 4";
+                    AssignLineDimension(GenJrnlLine."Journal Template Name", GenJrnlLine."Journal Batch Name", GenJrnlLine."Line No.", DimensionCode, DimensionValue);
+
                     GLImportStaging.Delete()
                 end;
-
             until (GLImportStaging.Next = 0)
         end;
         Commit();
@@ -312,5 +306,62 @@ page 99100 "GL Import Staging"
             exit(TempExcelBuffer."Cell Value as Text")
         else
             exit('');
+    end;
+
+    procedure AssignLineDimension(JournalTemplateName: Text; JournalBatchName: Code[20]; LineNo: Integer; DimensionCode: Code[20]; DimensionValue: Code[20]);
+    var
+        TempDimSetEntry: Record "Dimension Set Entry" temporary;
+        GenJrnlLine: Record "Gen. Journal Line";
+        DimMgt: Codeunit DimensionManagement;
+        NewDimSetID: Integer;
+        OldDimSetID: Integer;
+        GLSetup: Record "General Ledger Setup";
+    begin
+
+        if (DimensionCode <> '') and (DimensionValue <> '') then begin
+
+            GenJrnlLine.Get(JournalTemplateName, JournalBatchName, LineNo);
+
+            //obtain current line dimension set id and its dimensions
+            OldDimSetID := GenJrnlLine."Dimension Set ID";
+            DimMgt.GetDimensionSet(TempDimSetEntry, OldDimSetID);
+
+            //assign new/update existing dimension with data from external system
+            TempDimSetEntry.Reset();
+            TempDimSetEntry.SetRange("Dimension Code", DimensionCode);
+            if TempDimSetEntry.FindFirst() then begin
+                TempDimSetEntry.Validate("Dimension Value Code", DimensionValue);
+                TempDimSetEntry.Modify();
+            end
+
+            else begin
+                TempDimSetEntry.Init();
+                TempDimSetEntry.Validate("Dimension Code", DimensionCode);
+                TempDimSetEntry.Validate("Dimension Value Code", DimensionValue);
+                TempDimSetEntry.Insert();
+            end;
+
+            //obtain DimSetID after line dimension update
+            NewDimSetID := DimMgt.GetDimensionSetID(TempDimSetEntry);
+
+            //update line dimension set id 
+            if OldDimSetID <> NewDimSetID then begin
+                GenJrnlLine."Dimension Set ID" := NewDimSetID;
+                GenJrnlLine.Modify();
+            end;
+
+            //update line's global dimensions
+            GLSetup.Get();
+            if DimensionCode = GLSetup."Global Dimension 1 Code" then begin
+                GenJrnlLine.Validate("Shortcut Dimension 1 Code", DimensionValue);
+                GenJrnlLine.Modify();
+            end;
+
+            if DimensionCode = GLSetup."Global Dimension 2 Code" then begin
+                GenJrnlLine.Validate("Shortcut Dimension 2 Code", DimensionValue);
+                GenJrnlLine.Modify();
+            end;
+        end;
+        // DimMgt.UpdateGlobalDimFromDimSetID(PurchaseLine."Dimension Set ID", PurchaseLine."Shortcut Dimension 1 Code", PurchaseLine."Shortcut Dimension 2 Code");
     end;
 }
