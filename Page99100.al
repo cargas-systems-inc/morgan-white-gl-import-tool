@@ -200,6 +200,7 @@ page 99100 "GL Import Staging"
                 GenJrnlLine.Description := GLImportStaging.Description;
                 GenJrnlLine.Amount := GLImportStaging.Amount;
                 GenJrnlLine.BssiEntityID := GLImportStaging."Dimension 1";
+                GenJrnlLine."Source Code" := 'GENJNL';
                 GenJrnlLine."Journal Template Name" := GLImportStaging."Journal Template Name";
                 GenJrnlLine."Journal Batch Name" := GLImportStaging."Journal Batch Name";
                 GenJrnlLine."Line No." := GLImportStaging."Line No.";
@@ -217,7 +218,7 @@ page 99100 "GL Import Staging"
                     AssignLineDimension(GenJrnlLine."Journal Template Name", GenJrnlLine."Journal Batch Name", GenJrnlLine."Line No.", DimensionCode, DimensionValue);
 
 
-                    DimensionCode := 'REINSURACE';
+                    DimensionCode := 'REINSURANCE';
                     DimensionValue := GLImportStaging."Dimension 3";
                     AssignLineDimension(GenJrnlLine."Journal Template Name", GenJrnlLine."Journal Batch Name", GenJrnlLine."Line No.", DimensionCode, DimensionValue);
 
