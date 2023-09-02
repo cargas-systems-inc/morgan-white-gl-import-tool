@@ -52,7 +52,6 @@ page 99100 "GL Import Staging"
             {
                 field("Journal Batch Name"; Rec."Journal Batch Name")
                 {
-                    Caption = 'Journal Batch Name';
                     ApplicationArea = All;
                 }
                 field("Line No."; Rec."Line No.")
@@ -167,21 +166,23 @@ page 99100 "GL Import Staging"
     var
         GenJrnlLine: Record "Gen. Journal Line";
         GLImportStaging: Record "GL Import Staging";
-        TempDimensionSetEntry: Record "Dimension Set Entry" temporary;
-        DimensionManagement: Codeunit DimensionManagement;
-        NewDimSetId: integer;
-        RowNo: Integer;
-        MaxRowNo: Integer;
+        DebitAmount: Decimal;
+        CreditAmount: Decimal;
+        // TempDimensionSetEntry: Record "Dimension Set Entry" temporary;
+        // DimensionManagement: Codeunit DimensionManagement;
+        // NewDimSetId: integer;
+        // RowNo: Integer;
+        // MaxRowNo: Integer;
         DimensionCode: Code[20];
         DimensionValue: Code[20];
     begin
-        RowNo := 0;
-        MaxRowNo := 0;
+        // RowNo := 0;
+        // MaxRowNo := 0;
 
-        GLImportStaging.Reset();
-        if GLImportStaging.FindLast() then begin
-            MaxRowNo := GLImportStaging."Line No.";
-        end;
+        // GLImportStaging.Reset();
+        // if GLImportStaging.FindLast() then begin
+        // MaxRowNo := GLImportStaging."Line No.";
+        // end;
 
         // for RowNo := 1 to MaxRowNo do
         if GLImportStaging.Find('-') then begin
@@ -192,6 +193,16 @@ page 99100 "GL Import Staging"
             repeat
                 GenJrnlLine.Init();
 
+                DebitAmount := 0;
+                CreditAmount := 0;
+
+                if GLImportStaging.Amount < 0 then begin
+                    CreditAmount := Abs(GLImportStaging.Amount);
+                end
+                else begin
+                    DebitAmount := GLImportStaging.Amount;
+                end;
+
                 GenJrnlLine."Posting Date" := GLImportStaging."Posting Date";
                 GenJrnlLine."Document No." := GLImportStaging."Document No.";
                 GenJrnlLine."External Document No." := GLImportStaging."Document No.";
@@ -199,7 +210,13 @@ page 99100 "GL Import Staging"
                 GenJrnlLine."Account No." := GLImportStaging."Account No.";
                 GenJrnlLine.Description := GLImportStaging.Description;
                 GenJrnlLine.Amount := GLImportStaging.Amount;
+                GenJrnlLine."Debit Amount" := DebitAmount;
+                GenJrnlLine."Credit Amount" := CreditAmount;
+                GenJrnlLine."Amount (LCY)" := GLImportStaging.Amount;
+                GenJrnlLine."Balance (LCY)" := GLImportStaging.Amount;
+                GenJrnlLine."Document Date" := GLImportStaging."Posting Date";
                 GenJrnlLine.BssiEntityID := GLImportStaging."Dimension 1";
+                GenJrnlLine.BssiOriginalEntityID := GLImportStaging."Dimension 1";
                 GenJrnlLine."Source Code" := 'GENJNL';
                 GenJrnlLine."Journal Template Name" := GLImportStaging."Journal Template Name";
                 GenJrnlLine."Journal Batch Name" := GLImportStaging."Journal Batch Name";

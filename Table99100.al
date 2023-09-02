@@ -13,7 +13,7 @@ table 99100 "GL Import Staging"
         }
         field(2; "Document No."; Code[20])
         {
-            Caption = 'Line No.';
+            Caption = 'Document No.';
             DataClassification = CustomerContent;
         }
         field(3; "External Document No."; Code[35])
