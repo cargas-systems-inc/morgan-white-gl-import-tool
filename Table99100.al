@@ -1,8 +1,8 @@
 // Defines a staging table for GL entries
 
-table 99100 "GL Import Staging"
+table 99100 "Cargas GL Import Staging"
 {
-    Caption = 'GL Import Staging';
+    Caption = 'Cargas GL Import Staging';
 
     fields
     {

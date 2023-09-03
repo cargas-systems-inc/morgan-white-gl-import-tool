@@ -30,7 +30,7 @@
 // Create an action to generate the batches and check for them to be empty
 // Provide record count progress in the UI
 
-page 99100 "GL Import Staging"
+page 99100 "Cargas GL Import Staging"
 {
     AutoSplitKey = true;
     Caption = 'GL Import Staging';
@@ -39,7 +39,7 @@ page 99100 "GL Import Staging"
     ModifyAllowed = true;
     PageType = Worksheet;
     SaveValues = true;
-    SourceTable = "GL Import Staging";
+    SourceTable = "Cargas GL Import Staging";
     SourceTableView = sorting("Journal Batch Name", "Line No.");
     UsageCategory = Tasks;
     ApplicationArea = All;
@@ -165,7 +165,7 @@ page 99100 "GL Import Staging"
     local procedure IntegrateToGL()
     var
         GenJrnlLine: Record "Gen. Journal Line";
-        GLImportStaging: Record "GL Import Staging";
+        GLImportStaging: Record "Cargas GL Import Staging";
         DebitAmount: Decimal;
         CreditAmount: Decimal;
         // TempDimensionSetEntry: Record "Dimension Set Entry" temporary;
@@ -272,7 +272,7 @@ page 99100 "GL Import Staging"
 
     local procedure ImportExcelData()
     var
-        GLImportStaging: Record "GL Import Staging";
+        GLImportStaging: Record "Cargas GL Import Staging";
         PostingDate: DateTime;
         RowNo: Integer;
         ColNo: Integer;
